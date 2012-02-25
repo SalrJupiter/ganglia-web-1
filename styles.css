@@ -70,14 +70,14 @@ td.metric
 
 td.cluster
 {
-   background: rgb(238,238,238);
+   background: #147eb3;
    /* padding: 1mm; */
 }
 
 td.grid
 {
    vertical-align: top;
-   background: rgb(204,204,255);
+   background: #c41111;
 }
 
 td.self

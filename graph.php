@@ -2,7 +2,7 @@
 /* $Id: graph.php 2183 2010-01-07 16:09:55Z d_pocock $ */
 include_once "./eval_config.php";
 include_once "./get_context.php";
-include_once "./functions.php";
+include_once "./lib/functions.php";
 
 # RFM - Added all the isset() tests to eliminate "undefined index"
 # messages in ssl_error_log.
@@ -19,6 +19,8 @@ $grid       = isset($_GET["G"])  ?  sanitize ( $_GET["G"] )   : NULL;
 $self       = isset($_GET["me"]) ?  sanitize ( $_GET["me"] )  : NULL;
 $vlabel     = isset($_GET["vl"]) ?  sanitize ( $_GET["vl"] )  : NULL;
 $value      = isset($_GET["v"])  ?  sanitize ( $_GET["v"] )   : NULL;
+
+$maxY       = isset($_GET["maxY"])  ?  sanitize ( $_GET["maxY"] )   : '';
 
 $max        = isset($_GET["x"])  ?  clean_number ( sanitize ($_GET["x"] ) ) : NULL;
 $min        = isset($_GET["n"])  ?  clean_number ( sanitize ($_GET["n"] ) ) : NULL;
@@ -57,6 +59,9 @@ if($command) {
 
 switch ($context)
 {
+    case "grid_overview":
+      $rrd_dir = "$rrds/__SummaryInfo__";
+      break;
     case "meta":
       $rrd_dir = "$rrds/__SummaryInfo__";
       break;
@@ -146,6 +151,14 @@ if ($range=="month")
 
 # Tidy up the title a bit
 switch ($context) {
+    case 'grid_overview':
+        $title = "$self Grid Overview";
+        break;
+
+    case 'grid_mesh':
+        $title = "$self Grid Mesh";
+        break;
+
     case 'meta':
         $title = "$self Grid";
         break;

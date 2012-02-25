@@ -1,12 +1,16 @@
 <?php
 /* $Id: get_context.php 2182 2010-01-07 16:00:54Z d_pocock $ */
 
-include_once "./functions.php";
+include_once "./lib/functions.php";
 
 $meta_designator = "Grid";
 $cluster_designator = "Cluster Overview";
 
 # Blocking malicious CGI input.
+$view = isset($_GET["view"]) ?
+	escapeshellcmd( clean_string( rawurldecode($_GET["view"]) ) ) : NULL;
+$mesh_first_metric = isset($_GET["mesh_first_metric"]) ?
+	escapeshellcmd( clean_string( rawurldecode($_GET["mesh_first_metric"]) ) ) : NULL;
 $clustername = isset($_GET["c"]) ?
 	escapeshellcmd( clean_string( rawurldecode($_GET["c"]) ) ) : NULL;
 $gridname = isset($_GET["G"]) ?
@@ -26,8 +30,7 @@ $metrictitle = isset($_GET["ti"]) ?
 	escapeshellcmd( clean_string( rawurldecode($_GET["ti"]) ) ) : NULL;
 $sort = isset($_GET["s"]) ?
 	escapeshellcmd( clean_string( rawurldecode($_GET["s"]) ) ) : NULL;
-$controlroom = isset($_GET["cr"]) ?
-	clean_number( rawurldecode($_GET["cr"]) ) : NULL;
+
 # Default value set in conf.php, Allow URL to overrride
 if (isset($_GET["hc"]))
 	$hostcols = clean_number($_GET["hc"]);
@@ -74,8 +77,20 @@ if (!isset($hostcols) || !is_numeric($hostcols)) $hostcols = 4;
 if (!isset($metriccols) || !is_numeric($metriccols)) $metriccols = 2;
 if (!is_numeric($showhosts)) $showhosts = 1;
 
-# Set context.
-if(!$clustername && !$hostname && $controlroom)
+# Set context
+if ($view == 'grid_overview')
+   {
+    $context = "grid_overview";
+   }
+elseif ($view == 'grid_mesh')
+   {
+    $context = "grid_mesh";
+   }
+elseif ($view == 'grid_hosts')
+   {
+    $context = "grid_hosts";
+   }
+elseif(!$clustername && !$hostname && isset($controlroom))
    {
       $context = "control";
    }
@@ -85,7 +100,8 @@ else if ($tree)
    }
 else if(!$clustername and !$gridname and !$hostname)
    {
-      $context = "meta";
+      $context = "grid_overview";
+//      $context = "meta";
    }
 else if($gridname)
    {
@@ -141,27 +157,27 @@ if ($context == "cluster") {
     }
 }
 
+
+
 # A hack for pre-2.5.0 ganglia data sources.
 $always_constant = array(
-   "swap_total" => 1,
-   "cpu_speed" => 1,
-   "swap_total" => 1
+   "swap_total"  => 1,
+   "cpu_speed"   => 1,
+   "swap_total"  => 1
 );
 
 $always_timestamp = array(
    "gmond_started" => 1,
-   "reported" => 1,
-   "sys_clock" => 1,
-   "boottime" => 1
+   "reported"      => 1,
+   "sys_clock"     => 1,
+   "boottime"      => 1
 );
+
+
 
 # List of report graphs
-$reports = array(
-   "load_report" => "load_one",
-   "cpu_report" => 1,
-   "mem_report" => 1,
-   "network_report" => 1,
-   "packet_report" => 1
-);
-
-?>
+$reports = array();
+foreach ($reportArray as $reportName => $reportData) {
+    $reports[$reportName] = 1;
+}
+$reports[$defaultReport] = $defaultReport;

@@ -366,7 +366,7 @@ function physical_racks()
    $unknownID= -1;
    if (is_array($hosts_up)) {
       foreach ($hosts_up as $host=>$v) {
-         # Try to find the node's location in the cluster.
+         # Try to find the nodes location in the cluster.
          list($rack, $rank, $plane) = findlocation($v);
 
          if ($rack>=0 and $rank>=0 and $plane>=0) {
@@ -460,5 +460,3 @@ function strip_domainname( $hostname ) {
         return $name;
     }
 }
-
-?>

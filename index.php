@@ -2,7 +2,7 @@
 /* $Id: index.php 2183 2010-01-07 16:09:55Z d_pocock $ */
 include_once "./eval_config.php";
 # ATD - function.php must be included before get_context.php.  It defines some needed functions.
-include_once "./functions.php";
+include_once "./lib/functions.php";
 include_once "./get_context.php";
 include_once "./ganglia.php";
 include_once "./get_ganglia.php";
@@ -10,7 +10,23 @@ include_once "./class.TemplatePower.inc.php";
 # Usefull for addons.
 $GHOME = ".";
 
-if ($context == "meta" or $context == "control")
+
+if ($context == "grid_overview") {
+      $title = "$self $meta_designator Overview";
+      include_once "./header.php";
+      include_once "./grid_overview.php";
+
+} elseif ($context == "grid_mesh") {
+      $title = "$self $meta_designator Mesh";
+      include_once "./header.php";
+      include_once "./grid_mesh_view.php";
+
+} elseif ($context == "grid_hosts") {
+      $title = "$self $meta_designator Hosts";
+      include_once "./header.php";
+      include_once "./grid_hosts_view.php";
+
+} elseif ($context == "meta" or $context == "control")
    {
       $title = "$self $meta_designator Report";
       include_once "./header.php";

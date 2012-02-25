@@ -1,15 +1,14 @@
 <?php
+
 /* $Id: meta_view.php 1710 2008-08-21 16:44:54Z bernardli $ */
-$tpl = new TemplatePower( template("meta_view.tpl") );
+$tpl = new TemplatePower( template("grid_overview.tpl") );
 $tpl->prepare();
 
-# Find the private clusters.  But no one is emabarrassed in the
-# control room (public only!). 
-if ( $context != "control" ) {
-   $private=embarrassed();
-}
+
 
 $source_names = array_keys($grid);
+
+
 
 # Build a list of cluster names and randomly pick a smaller subset to
 # display for control room mode.  This allows a dedicated host to
@@ -17,16 +16,7 @@ $source_names = array_keys($grid);
 # of these stations could monitor a large grid.
 #
 # For the standard meta view still display all the hosts.
-
-if ( $context == "control" ) {
-       srand((double)microtime()*1000000);
-       shuffle($source_names);
-       $subset = array_slice($source_names, 0, abs($controlroom));
-       $source_names = $subset;
-}
-
-foreach( $source_names as $c)
-   {
+foreach( $source_names as $c) {
       $cpucount = $metrics[$c]["cpu_num"]['SUM'];
       if (!$cpucount) $cpucount=1;
       $load_one = $metrics[$c]["load_one"]['SUM'];
@@ -34,8 +24,10 @@ foreach( $source_names as $c)
       $sorted_sources[$c] = $value;
       $values[$c] = $value;
       isset($total_load) or $total_load = 0;
-      $total_load += $value;   
-   }
+      $total_load += $value;
+}
+
+
 
 if ($sort == "descending") {
       $sorted_sources[$self] = 999999999;
@@ -60,6 +52,8 @@ if ($sort == "descending") {
       $sorted_sources[$self] = -1;
       asort($sorted_sources);
 }
+
+
 
 # Display the sources. The first is ourself, the rest are our children.
 foreach ( $sorted_sources as $source => $val )
@@ -152,6 +146,7 @@ foreach ( $sorted_sources as $source => $val )
                $tpl->assign("localtime", "<font size=-1>Localtime:</font><br>&nbsp;&nbsp;"
                   . date("Y-m-d H:i",$localtime));
          }
+	break;
    }
 
 # Show load images.
@@ -214,5 +209,30 @@ if ($show_meta_snapshot=="yes") {
       }
 }
 
+
+
+/*
+ * List reports
+ */
+$reportsInRow = 0;
+foreach ($reportArray as $reportId => $reportData) {
+    $reportsInRow++;
+    $tpl->newBlock("report_graph");
+
+    $tpl->assign('name',         $name );
+    $tpl->assign('report_id',    $reportId);
+    $tpl->assign('report_title', $reportData['title']);
+    $tpl->assign('maxY',         $reportData['maxY']);
+    $tpl->assign('range',        $range);
+
+    // Insert newline?
+    if ($reportsInRow >= 3) {
+	$reportsInRow = 0;
+	$tpl->assign('new_table_row', '</tr><tr>');
+    } else {
+	$tpl->assign('new_table_row', '');
+    }
+}
+
 $tpl->printToScreen();
-?>
+

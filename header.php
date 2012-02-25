@@ -69,7 +69,10 @@ if(count($gridstack) > 1) {
 
 $tpl = new TemplatePower( template("$header.tpl") );
 $tpl->prepare();
-$tpl->assign("page_title", $title);
+$tpl->assign("base_url",    $conf_base_url);
+$tpl->assign("logo_url",    $conf_logo_url);
+$tpl->assign("favicon_url", $conf_favicon_url);
+$tpl->assign("page_title",  $conf_title_prefix . $title);
 $tpl->assign("refresh", $default_refresh);
 
 # Templated Logo image
@@ -95,14 +98,32 @@ if ($jobrange and $jobstart)
 $cluster_url=rawurlencode($clustername);
 $node_url=rawurlencode($hostname);
 
+
+
 # Make some information available to templates.
 $tpl->assign("cluster_url", $cluster_url);
 
-if ($context=="cluster")
-   {
+if ($context == "grid_overview") {
+      $tpl->assign("alt_view", "<a href=\"./?view=grid_mesh&r=$range\">Grid mesh</a>");
+
+} elseif ($context == "grid_mesh") {
+      $tpl->assign("alt_view", "<a href=\"./?view=grid_overview&r=$range\">Grid overview</a>");
+
+} elseif ($context == "grid_hosts") {
+      $tpl->assign("alt_view", "<a href=\"./?view=grid_overview&r=$range\">Grid overview</a><br /><a href=\"./?view=grid_mesh&r=$range\">Grid mesh</a>");
+
+} elseif ($context == "grid_hosts") {
+      $tpl->assign("alt_view", "<a href=\"./?view=grid_overview&r=$range\">Grid overview</a>");
+
+
+} elseif ($context=="meta") {
+      $tpl->assign("alt_view", "<a href=\"./?view=grid_overview\">FIXME KRNEKI</a>");
+
+
+} elseif ($context=="cluster") {
       $tpl->assign("alt_view", "<a href=\"./?p=2&amp;c=$cluster_url\">Physical View</a>");
-   }
-elseif ($context=="physical")
+
+} elseif ($context=="physical")
    {
       $tpl->assign("alt_view", "<a href=\"./?c=$cluster_url\">Full View</a>");
    }
@@ -117,6 +138,8 @@ elseif ($context=="host")
       "<a href=\"./?p=2&amp;c=$cluster_url&amp;h=$node_url\">Node View</a>");
    }
 
+
+
 # Build the node_menu
 $node_menu = "";
 
@@ -127,10 +150,19 @@ if ($parentgrid)
       $node_menu .= "<B>&gt;</B>\n";
    }
 
+
+
 # Show grid.
 $mygrid =  ($self == "unspecified") ? "" : $self;
 $node_menu .= "<B><A HREF=\"./?$get_metric_string\">$mygrid $meta_designator</A></B> ";
 $node_menu .= "<B>&gt;</B>\n";
+
+if ($view) {
+    $node_menu .= hiddenvar("view", $view);
+}
+if ($mesh_first_metric) {
+    $node_menu .= hiddenvar("mesh_first_metric", $mesh_first_metric);
+}
 
 if ($physical)
    $node_menu .= hiddenvar("p", $physical);
@@ -216,7 +248,7 @@ $tpl->assign("node_menu", $node_menu);
 
 //////////////////// Build the metric menu ////////////////////////////////////
 
-if( $context == "cluster" )
+if( $context == "cluster" || $context == 'grid_hosts' )
    {
    if (!count($metrics)) {
       echo "<h4>Cannot find any metrics for selected cluster \"$clustername\", exiting.</h4>\n";
@@ -255,7 +287,7 @@ if (!$physical) {
 #
 # Only show metric list if we have some and are in cluster context.
 #
-if (is_array($context_metrics) and $context == "cluster")
+if ((is_array($context_metrics) and ($context == "cluster")) || ($context == "grid_hosts"))
    {
       $metric_menu = "<B>Metric</B>&nbsp;&nbsp;"
          ."<SELECT NAME=\"m\" OnChange=\"ganglia_form.submit();\">\n";

@@ -10,6 +10,8 @@
 function embarrassed ()
 {
    global $gmetad_root;
+   $private = array();
+
    # The @ in front of a function name suppresses any warnings from it.
    $fp=@fopen("./private_clusters","r");
    if ($fp) {

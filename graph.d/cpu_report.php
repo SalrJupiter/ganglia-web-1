@@ -20,7 +20,7 @@ function graph_cpu_report ( &$rrdtool_graph ) {
     }
 
     $rrdtool_graph['height'] += ($size == 'medium') ? 14 : 0;
-    $title = 'CPU';
+    $title = '   CPU   ';
     if ($context != 'host') {
        $rrdtool_graph['title'] = $title;
     } else {
@@ -83,5 +83,3 @@ function graph_cpu_report ( &$rrdtool_graph ) {
 
     return $rrdtool_graph;
 }
-
-?>
